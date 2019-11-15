@@ -13,14 +13,23 @@ int NUMNODES=0;
 struct Node;
 vector<Node> graph;
 
+struct kV
+{
+    int key;
+    int value;
+};
 struct Node
 {
   int id;
   map<int, int> neighbors;
+  vector<kV> neighborsVector;
   int distanceFromSrc= INT_MAX;
   int viaNode;
+  vector<int> shortestPathFromSrc;
 
 };
+
+
 
 void printList(vector<int> v){
   cout << "[";
@@ -45,7 +54,7 @@ int existsIn(vector<int> nodes, int nodeId){
 }
 int generateGraph(){
   string line;
-  ifstream graphData ("Adj1.txt");
+  ifstream graphData ("Adj.txt");
   string numNodes;
   if(graphData.is_open()){
     getline(graphData, numNodes);
@@ -76,6 +85,10 @@ int generateGraph(){
       //  cout <<"Creating node: "<< nodeA<<endl;
         temp.id= stoi(nodeA);
         temp.neighbors.insert(pair<int,int>(stoi(nodeB), stoi(lengthAB)));
+        struct kV tempKV;
+        tempKV.key = stoi(nodeB);
+        tempKV.value = stoi(lengthAB);
+        temp.neighborsVector.push_back(tempKV);
         graph.push_back(temp);
         // cout << "Node: "<< temp.id << "created!"<<endl;
 
@@ -83,6 +96,10 @@ int generateGraph(){
       else{
         //cout<<"Node " <<foundIndex << " was found!"<<endl;
         graph.at(foundIndex).neighbors.insert(pair<int,int>(stoi(nodeB), stoi(lengthAB)));
+        struct kV tempKV;
+        tempKV.key = stoi(nodeB);
+        tempKV.value = stoi(lengthAB);
+        graph.at(foundIndex).neighborsVector.push_back(tempKV);
       }
 
 
@@ -189,13 +206,57 @@ int dijkstra(int source, int dest){
 
 return 0;
 
-void generateRoutingTable(){
 
+}
+
+void generateRoutingTable(int src){
+  for (int i=0; i< graph.size(); i++){
+    int currentNode=graph.at(i).id;
+  //  cout<<"Current node: "<<currentNode<<endl;
+    graph.at(i).shortestPathFromSrc.insert(graph.at(i).shortestPathFromSrc.begin(), graph.at(i).id);
+    while(currentNode != src){
+      //cout<<"Insert to path "<<currentNode<<endl;
+      graph.at(i).shortestPathFromSrc.insert(graph.at(i).shortestPathFromSrc.begin(), graph.at(currentNode).viaNode);
+      currentNode=graph.at(currentNode).viaNode;
+    }
+    cout << "Node "<<graph.at(i).id<< "Path"<<endl;
+    printList(graph.at(i).shortestPathFromSrc);
+  }
+  cout<<"Routing table(<Destination> <Cost> <Next hop>):"<<endl;
+  for(int i=0; i<graph.size(); i++){
+    int nextHop;
+    if (i != src){
+      for (int j=0; j< graph.at(i).shortestPathFromSrc.size(); j++){
+        if (graph.at(i).shortestPathFromSrc.at(j) == src){
+          nextHop = graph.at(i).shortestPathFromSrc.at(j+1);
+        //  cout <<"Next Hop: "<<nextHop<<endl;
+        }
+
+      }
+
+      int cost;
+      // for (auto itr= graph.at(i).neighbors.find(nextHop); itr!=graph.at(i).neighbors.end(); itr++){
+      //   int poop= itr->first;
+      //   cost = itr->second;
+      //   cout<< "First: "<<poop <<"Second: "<<cost<<endl;
+      // }
+      for (int x=0; x< graph.at(src).neighborsVector.size(); x++){
+      //   cout << "Neighbors of " << i<<endl;
+         //cout << graph.at(i).neighborsVector.at(x).key << '\t'<< graph.at(i).neighborsVector.at(x).value <<endl;
+        if (graph.at(src).neighborsVector.at(x).key == nextHop)
+          cost = graph.at(src).neighborsVector.at(x).value;
+      }
+
+      cout << graph.at(i).id<< " "<< graph.at(i).distanceFromSrc<< " "<< nextHop << endl;
+
+    }
+  }
   return;
 }
-}
+
 int main(){
   generateGraph();
   dijkstra(0,2);
+  generateRoutingTable(0);
   return 0;
 }
