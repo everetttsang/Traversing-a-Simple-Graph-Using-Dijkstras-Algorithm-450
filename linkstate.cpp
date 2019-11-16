@@ -254,9 +254,18 @@ void generateRoutingTable(int src){
   return;
 }
 
+void generateMinimumPathTree(){
+  for (int i=0; i<graph.size(); i++){
+    cout << graph.at(i).id<< ": ";
+    printList(graph.at(i).shortestPathFromSrc);
+  }
+  return;
+}
+
 int main(){
   generateGraph();
   dijkstra(0,2);
   generateRoutingTable(0);
+  generateMinimumPathTree();
   return 0;
 }
