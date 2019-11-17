@@ -59,7 +59,7 @@ int generateGraph(){
   if(graphData.is_open()){
     getline(graphData, numNodes);
     NUMNODES= stoi(numNodes);
-    cout<< "NUMBEROFNODES: " << NUMNODES <<endl;
+    // cout<< "NUMBEROFNODES: " << NUMNODES <<endl;
     while(getline(graphData,line)){
       struct Node temp;
       string nodeA;
@@ -118,7 +118,7 @@ int generateGraph(){
   return 0;
 }
 
-int dijkstra(int source, int dest){
+int dijkstra(int source){
   vector<int> visited;
   vector<int> unvisited;
   int shortestPath=0;
@@ -134,7 +134,7 @@ int dijkstra(int source, int dest){
   int leastCostNode;
   int leastCost;
   currentNode= source;
-  //visited.push_back(currentNode);
+  visited.push_back(currentNode);
   map<int, int>:: iterator itr;
   int key;
   int value;
@@ -143,63 +143,81 @@ int dijkstra(int source, int dest){
     shortestPath= graph.at(currentNode).distanceFromSrc;
     leastCost=INT_MAX;
     int anyUnvisitedNeighborsLeft=0;
-    cout << "Visited: ";
-    printList(visited);
-    cout <<endl<<"Unvisited: ";
-    printList(unvisited);
-    cout<<endl;
+    //visited.push_back(currentNode);
 
-    cout <<"Current node: " << currentNode <<endl;
-    cout <<"Current shortest path: "<<shortestPath<<endl;
+    // cout << "Visited: ";
+    // printList(visited);
+  //  cout <<endl<<"Unvisited: ";
+    //printList(unvisited);
+  //  cout<<endl;
+
+    //cout <<"Current node: " << currentNode <<endl;
+  //  cout <<"Current shortest path: "<<shortestPath<<endl;
 
     for (itr = graph.at(currentNode).neighbors.begin(); itr!=graph.at(currentNode).neighbors.end(); ++itr){
       key = itr->first;
       value = itr->second;
-      cout << "Neighbor: " << key<< " Distance: "<< value<<endl;
+      //cout << "Neighbor: " << key<< " Distance: "<< value<<endl;
 
       if( (shortestPath+value) < graph.at(key).distanceFromSrc){
-        cout<<"Edge path length " << key << " path distance " << (shortestPath+value)<<endl;
+        //cout<<"New shortest Node " << key << " path distance " << (shortestPath+value)<<endl;
         graph.at(key).distanceFromSrc = shortestPath+value;
         graph.at(key).viaNode = currentNode;
       }
 
-      if (value < leastCost && existsIn(visited, key)==-1){
-        leastCostNode = key;
-        leastCost = value;
-        anyUnvisitedNeighborsLeft=1;
-        //cout << "New cheap node: " << leastCostNode << " of distance: "<<leastCost<<endl;
-      }
 
     }
-    if(anyUnvisitedNeighborsLeft){
-      cout <<"Least cost node: "<<leastCostNode<<endl;
+
+    Node nextNode;
+
+    int tempShortestDistance=INT_MAX;
+    //cout << "CURRENT ROUTING TABLE" <<endl;
+    for (int i=0; i< graph.size(); i++){
+    //  cout << graph.at(i).id <<'\t'<<graph.at(i).distanceFromSrc<<endl;
+
+
+
+    }
+    for (int i=0; i< unvisited.size(); i++){
+
+      if (graph.at(unvisited.at(i)).distanceFromSrc<tempShortestDistance && graph.at(unvisited.at(i)).id!=source){
+        tempShortestDistance = graph.at(unvisited.at(i)).distanceFromSrc;
+      //  cout <<"Node "<< graph.at(unvisited.at(i)).id << " Shortest Distance\t"<< tempShortestDistance<< endl;
+        nextNode= graph.at(unvisited.at(i));
+      }
+    }
+    int pushedToList=0;
+    if(unvisited.size()>0){
+      // cout <<"Least cost node: "<<leastCostNode<<endl;
       //shortestPath+= leastCost;
       vector<int>::iterator ptr = unvisited.begin();
       advance(ptr, existsIn(unvisited,currentNode));
       unvisited.erase(ptr);
-      visited.push_back(currentNode);
-      currentNode = leastCostNode;
+      for (int i=0; i< visited.size();i++){
+        if (visited.at(i)== currentNode)
+          pushedToList=1;
+      }
+      if(!pushedToList)
+        visited.push_back(currentNode);
+      currentNode = nextNode.id;
     }
     else{
-      visited.push_back(currentNode);
-      unvisited.clear();
-      cout << "Visited: ";
-      printList(visited);
-      cout <<endl<<"Unvisited: ";
-      printList(unvisited);
-      cout<<endl;
-
-    }
-    for (int i=0; i< graph.size(); i++){
-      if(graph.at(i).distanceFromSrc< tempShortestPath && graph.at(i).distanceFromSrc>0){
-        tempShortestPath = graph.at(i).distanceFromSrc;
-        shortestPath+= tempShortestPath;
+      for (int i=0; i< visited.size();i++){
+        if (visited.at(i)== currentNode)
+          pushedToList=1;
       }
-      cout<< "Node: "<<graph.at(i).id << " SP: "<<graph.at(i).distanceFromSrc << " via: "<<graph.at(i).viaNode<<endl;
+      if(!pushedToList)
+        visited.push_back(currentNode);
+      unvisited.clear();
+      //cout << "Visited: ";
+    //  printList(visited);
+      //cout <<endl<<"Unvisited: ";
+    //  printList(unvisited);
+    //  cout<<endl;
+
     }
 
-
-    cout << "----------------------"<<endl;
+    //cout << "----------------------"<<endl;
   }
   while (unvisited.size() >0);
 
@@ -210,6 +228,7 @@ return 0;
 }
 
 void generateRoutingTable(int src){
+  cout << "Minimum path tree (represented by path): " <<endl;
   for (int i=0; i< graph.size(); i++){
     int currentNode=graph.at(i).id;
   //  cout<<"Current node: "<<currentNode<<endl;
@@ -219,7 +238,7 @@ void generateRoutingTable(int src){
       graph.at(i).shortestPathFromSrc.insert(graph.at(i).shortestPathFromSrc.begin(), graph.at(currentNode).viaNode);
       currentNode=graph.at(currentNode).viaNode;
     }
-    cout << "Node "<<graph.at(i).id<< "Path"<<endl;
+    //cout << "Node "<<graph.at(i).id<< "Path"<<endl;
     printList(graph.at(i).shortestPathFromSrc);
   }
   cout<<"Routing table(<Destination> <Cost> <Next hop>):"<<endl;
@@ -235,14 +254,8 @@ void generateRoutingTable(int src){
       }
 
       int cost;
-      // for (auto itr= graph.at(i).neighbors.find(nextHop); itr!=graph.at(i).neighbors.end(); itr++){
-      //   int poop= itr->first;
-      //   cost = itr->second;
-      //   cout<< "First: "<<poop <<"Second: "<<cost<<endl;
-      // }
+
       for (int x=0; x< graph.at(src).neighborsVector.size(); x++){
-      //   cout << "Neighbors of " << i<<endl;
-         //cout << graph.at(i).neighborsVector.at(x).key << '\t'<< graph.at(i).neighborsVector.at(x).value <<endl;
         if (graph.at(src).neighborsVector.at(x).key == nextHop)
           cost = graph.at(src).neighborsVector.at(x).value;
       }
@@ -256,7 +269,7 @@ void generateRoutingTable(int src){
 
 int main(){
   generateGraph();
-  dijkstra(0,2);
+  dijkstra(0);
   generateRoutingTable(0);
   return 0;
 }

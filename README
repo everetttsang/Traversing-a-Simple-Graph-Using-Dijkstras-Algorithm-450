@@ -1,0 +1,21 @@
+This code was written for the purpose of completing the second programming assignment
+in Professor Raghavendra's EE450 Fall2019 course. All code was written by Everett
+Tsang for except for excerpts of tutorial code found from https://www.geeksforgeeks.org/iterators-c-stl/
+for the usage of iterating through a map data structure.
+
+The program executes three main methods in its main() function.
+These are:
+generateGraph() which reads data from a file to create an information structure,
+  a vector of nodes containing adjacency information and costs.
+dijkstra(int source) which executes the dijkstra's algorithm on the global map variable
+  and stores the computed information in a respective node's data structure
+  ie distance from source, current shortest path from source node. This method takes
+  a single parameter is the source node from which to start the algorithm.
+generateRoutingTable(int source) generates the minimum path tree and routing TABLE
+  specified in by the parameter (int source). The input to this method must be consistent
+  with that of the input to the dijkstra method in order for data to be correctly computed
+
+
+At first glance, there exists two structures within a node that contain neighboring node information,
+one in the form of a map and the other in a vector. These two contain identical information and are both
+used in computation. 
