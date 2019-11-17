@@ -18,4 +18,4 @@ generateRoutingTable(int source) generates the minimum path tree and routing TAB
 
 At first glance, there exists two structures within a node that contain neighboring node information,
 one in the form of a map and the other in a vector. These two contain identical information and are both
-used in computation. 
+used in computation. It should also be noted that in the minimum path tree, the branch containing a single element is a artificial (semantic) path from the source node to itself.
